@@ -44,6 +44,7 @@
     "jsdom": "^8",
     "karma": "^0.13.22",
     "karma-babel-preprocessor": "^6.0.1",
+    "karma-browserstack-launcher": "^1.0.1",
     "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^1.0.0",
     "karma-firefox-launcher": "^1.0.0",

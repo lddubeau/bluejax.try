@@ -1,11 +1,24 @@
-/* global module */
+/* global module require */
+"use strict";
+
+// Minimal localConfig if there is not one locally.
+var localConfig = {
+  browserStack: {},
+};
+try {
+  // eslint-disable-next-line import/no-unresolved, global-require
+  localConfig = require("./localConfig");
+}
+catch (ex) {} // eslint-disable-line no-empty
+
 module.exports = function configure(config) {
   "use strict";
-  config.set({
+  var options = {
     basePath: "",
     frameworks: ["requirejs", "mocha"],
     files: [
       "test/karma-main.js",
+      "node_modules/babel-polyfill/dist/polyfill.js",
       { pattern: "index.js", included: false },
       { pattern: "test/**/!(commonjs).js", included: false },
       { pattern: "node_modules/jquery/dist/jquery.js", included: false },
@@ -54,8 +67,80 @@ module.exports = function configure(config) {
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: false,
+    autoWatch: true,
     browsers: ["Chrome", "Firefox"],
+    browserStack: {
+      username: localConfig.browserStack.username,
+      accessKey: localConfig.browserStack.accessKey,
+      project: "bluejax.try",
+    },
+    customLaunchers: {
+      ChromeWin: {
+        base: "BrowserStack",
+        browser: "Chrome",
+        os: "Windows",
+        os_version: "10",
+      },
+      FirefoxWin: {
+        base: "BrowserStack",
+        browser: "Firefox",
+        os: "Windows",
+        os_version: "10",
+      },
+      IE11: {
+        base: "BrowserStack",
+        browser: "IE",
+        browser_version: "11",
+        os: "Windows",
+        os_version: "10",
+      },
+      IE10: {
+        base: "BrowserStack",
+        browser: "IE",
+        browser_version: "10",
+        os: "Windows",
+        os_version: "8",
+      },
+      Edge: {
+        base: "BrowserStack",
+        browser: "Edge",
+        os: "Windows",
+        os_version: "10",
+      },
+      Opera: {
+        base: "BrowserStack",
+        browser: "Opera",
+        os: "Windows",
+        os_version: "10",
+      },
+      SafariElCapitan: {
+        base: "BrowserStack",
+        browser: "Safari",
+        os: "OS X",
+        os_version: "El Capitan",
+      },
+      SafariYosemite: {
+        base: "BrowserStack",
+        browser: "Safari",
+        os: "OS X",
+        os_version: "Yosemite",
+      },
+      SafariMavericks: {
+        base: "BrowserStack",
+        browser: "Safari",
+        os: "OS X",
+        os_version: "Mavericks",
+      },
+    },
     singleRun: false,
-  });
+    concurrency: 2,
+  };
+
+  if (config.browsers.length === 1 && config.browsers[0] === "all") {
+    var newList = options.browsers.concat(Object.keys(options.customLaunchers));
+    config.browsers.splice.apply(config.browsers,
+                                 [0, config.browsers.length].concat(newList));
+  }
+
+  config.set(options);
 };
