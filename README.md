@@ -7,6 +7,24 @@ queries. This library does **not** wrap jQuery's ``ajax`` call in Bluebird
 promises. This makes it suitable to be used to implement query retry in cases
 where the code interfacing with it expects to work with a ``jqXHR`` object.
 
+Platforms Supported
+===================
+
+``bluejax.try is`` tested on Chrome, Firefox, IE11 and 10, Edge, Opera, and
+Safari (on El Capitan, Yosemite, Mavericks). We test against the latest versions
+offered by the vendors of these browsers on their respective platforms.
+
+The suite suite fails on IE9. I currently have no plans to work on adding
+support for IE9 but if you want to provide a pull request that will make
+``bluejax.try`` run on IE9 and will keep its current tests passing, you are
+welcome to do so.
+
+[![Browser Stack](https://www.browserstack.com/images/mail/browserstack-logo-footer.png)](https://www.browserstack.com)
+
+Bluejax is tested using
+[BrowserStack](https://www.browserstack.com). BrowserStack provides this service
+for free under their program for supporting open-source software.
+
 Loading ``bluejax.try``
 =======================
 
