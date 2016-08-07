@@ -1,5 +1,6 @@
 /* global module require */
 "use strict";
+var _ = require("lodash");
 
 // Minimal localConfig if there is not one locally.
 var localConfig = {
@@ -70,8 +71,6 @@ module.exports = function configure(config) {
     autoWatch: true,
     browsers: ["Chrome", "Firefox"],
     browserStack: {
-      username: localConfig.browserStack.username,
-      accessKey: localConfig.browserStack.accessKey,
       project: "bluejax.try",
     },
     customLaunchers: {
@@ -136,10 +135,15 @@ module.exports = function configure(config) {
     concurrency: 2,
   };
 
-  if (config.browsers.length === 1 && config.browsers[0] === "all") {
+  // Bring in the options from the localConfig file.
+  _.merge(options.browserStack, localConfig.browserStack);
+
+  var browsers = config.browsers;
+  if (browsers.length === 1 && browsers[0] === "all") {
     var newList = options.browsers.concat(Object.keys(options.customLaunchers));
-    config.browsers.splice.apply(config.browsers,
-                                 [0, config.browsers.length].concat(newList));
+
+    // Yes, we must modify this array in place.
+    browsers.splice.apply(browsers, [0, browsers.length].concat(newList));
   }
 
   config.set(options);
