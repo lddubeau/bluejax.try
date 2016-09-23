@@ -1,4 +1,5 @@
 /* global module require */
+/* eslint-env node */
 "use strict";
 var _ = require("lodash");
 
@@ -13,7 +14,6 @@ try {
 catch (ex) {} // eslint-disable-line no-empty
 
 module.exports = function configure(config) {
-  "use strict";
   var options = {
     basePath: "",
     frameworks: ["requirejs", "mocha"],
