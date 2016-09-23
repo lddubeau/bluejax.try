@@ -7,6 +7,14 @@ queries. This library does **not** wrap jQuery's ``ajax`` call in Bluebird
 promises. This makes it suitable to be used to implement query retry in cases
 where the code interfacing with it expects to work with a ``jqXHR`` object.
 
+jQuery Versions Supported
+=========================
+
+In the 3.x and 2.x series: any version.
+
+In the 1.x series: 1.11 or later. This being said, ``bluejax.try`` probably
+works fine with 1.9 and 1.10.
+
 Platforms Supported
 ===================
 

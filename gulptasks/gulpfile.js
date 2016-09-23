@@ -31,6 +31,25 @@ function exec(command, options) {
   });
 }
 
+function spawn(cmd, args, options) {
+  return new Promise((resolve, reject) => {
+    const child = child_process.spawn(cmd, args || [], options || {});
+    child.on("exit", (code, signal) => {
+      if (code) {
+        reject(new Error(`child terminated with code: ${code}`));
+        return;
+      }
+
+      if (signal) {
+        reject(new Error(`child terminated with signal: ${signal}`));
+        return;
+      }
+
+      resolve();
+    });
+  });
+}
+
 gulp.task("lint", () =>
           gulp.src(["*.js", "test/**/*.js", "gulptasks/**/*.js"])
             .pipe(eslint())
@@ -53,7 +72,22 @@ gulp.task("uglify", ["lint"], () =>
             .pipe(sourcemaps.write("."))
             .pipe(gulp.dest("dist")));
 
-gulp.task("test", ["semver", "test-mocha", "test-karma"]);
+function runTest(version) {
+  return exec(`npm install jquery@${version}`).then(
+    () => spawn("gulp", ["_test"], {
+      stdio: "inherit",
+    }));
+}
+
+const jqueryVersions = ["1.11", "2", "3"];
+
+for (const version of jqueryVersions) {
+  gulp.task(`test-with-jquery-${version}`, () => runTest(version));
+}
+
+gulp.task("test", () => Promise.each(jqueryVersions, runTest));
+
+gulp.task("_test", ["semver", "test-mocha", "test-karma"]);
 
 gulp.task("semver",
           () => execFileAsync("./node_modules/.bin/semver-sync", ["-v"]));

@@ -68,6 +68,30 @@ describe("", () => {
     }
   });
 
+  function assertSameKeys(objs, options) {
+    const { idFunction, filterBy } = options;
+    const getKeys = filterBy ?
+            (obj => Object.keys(obj).filter(x => filterBy.indexOf(x) !== -1)) :
+            (obj => Object.keys(obj));
+    let obj;
+    let keys;
+    let next = objs[0];
+    let nextKeys = getKeys(next);
+    let i = 0;
+    const limit = objs.length;
+    while (i < limit - 1) {
+      i++;
+      obj = next;
+      keys = nextKeys;
+      next = objs[i];
+      nextKeys = getKeys(next);
+      const msg = idFunction ?
+              `${idFunction(obj)} differs from ${idFunction(next)}` :
+              "";
+      assert.sameMembers(keys, nextKeys, msg);
+    }
+  }
+
   function assertEqualXhr(wrapper, stock) {
     const names = ["readyState", "status", "statusText", "responseXML",
                    "responseText"];
@@ -75,6 +99,10 @@ describe("", () => {
     for (const name of names) {
       assert.equal(wrapper[name], stock[name], `${name} value differs`);
     }
+
+    assertSameKeys([wrapper, stock], {
+      filterBy: ["success", "error", "complete"],
+    });
   }
 
   describe("extractBluejaxOptions", () => {

@@ -29,6 +29,8 @@
 }(this, function factory($) {
   "use strict";
 
+  var jqueryMajor = parseInt($.fn.jquery.split(".", 1)[0]);
+
   // We need this function to handle the ``context`` option. Specifically, when
   // we copy the options we must copy everything *except* ``context``.
   function copyAjaxOptions(options) {
@@ -164,21 +166,24 @@
       },
     };
 
+    var deferred = this.deferred = $.Deferred(); // eslint-disable-line new-cap
+    deferred.promise(wrapperXhr);
+
     // eslint-disable-next-line new-cap
     var completeDeferred = $.Callbacks("once memory");
 
-    var deferred = this.deferred = $.Deferred(); // eslint-disable-line new-cap
-    deferred.promise(wrapperXhr).complete = completeDeferred.add;
-
-    wrapperXhr.success = wrapperXhr.done;
-    wrapperXhr.error = wrapperXhr.fail;
-
-    for (name in saved) { // eslint-disable-line guard-for-in
-      // statusCode is special
-      if (name !== "statusCode") {
-        wrapperXhr[name](saved[name]);
-      }
+    // jQuery 3 and higher does not support the success, error and complete
+    // handlers.  So we do not want to create them for those versions.
+    if (jqueryMajor < 3) {
+      wrapperXhr.success = wrapperXhr.done;
+      wrapperXhr.error = wrapperXhr.fail;
+      wrapperXhr.complete = completeDeferred.add;
     }
+
+    // We do not do "statusCode" because it is special.
+    completeDeferred.add(saved.complete);
+    wrapperXhr.done(saved.success);
+    wrapperXhr.fail(saved.error);
   }
 
   // Transfer properties from an xhr object to the wrapper.
@@ -211,7 +216,7 @@
 
     this.wrapperXhr.latestXhr = thisXhr;
 
-    thisXhr.fail(this.failed.bind(this)).success(this.succeeded.bind(this));
+    thisXhr.fail(this.failed.bind(this)).done(this.succeeded.bind(this));
     this.transferToWrapper(thisXhr);
   };
 

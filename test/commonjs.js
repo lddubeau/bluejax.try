@@ -1,7 +1,9 @@
-/* global __dirname describe it setTimeout */
+/* global __dirname describe it setTimeout before after */
 import chai from "chai";
 import jsdom from "jsdom";
 import { Promise } from "bluebird";
+import mockery from "mockery";
+import jquery from "jquery";
 
 const assert = chai.assert;
 
@@ -46,8 +48,27 @@ describe("loads", () => {
     assert.isDefined(bluetry.make);
   }
 
-  // eslint-disable-next-line global-require
-  it("in CommonJS", () => checkDefinitions(require("../index.js")));
+  describe("", () => {
+    // Alas loading jQuery in a CommonJS environment where there is no window
+    // natively is a bit of a mess. jQuery detects the lack of window and
+    // exports a constructor that must be called with a window. Here we work
+    // around the problem, using Mockery.
+    before(() => {
+      mockery.enable({
+        useCleanCache: true,
+        warnOnUnregistered: false,
+        warnOnReplace: false,
+      });
+
+      const window = jsdom.jsdom("").defaultView;
+      mockery.registerMock("jquery", jquery(window));
+    });
+
+    after(() => mockery.disable());
+
+    // eslint-disable-next-line global-require
+    it("in CommonJS", () => checkDefinitions(require("../index.js")));
+  });
 
   it("through script tags", () =>
      new JSDom([
