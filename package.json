@@ -6,7 +6,8 @@
   "keywords": [
     "Ajax",
     "jQuery",
-    "retry"
+    "retry",
+    "promise"
   ],
   "author": "Louis-Dominique Dubeau <ldd@lddubeau.com>",
   "repository": {
