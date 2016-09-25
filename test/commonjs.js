@@ -16,7 +16,7 @@ class JSDom {
     // vc is useful for debugging.
     const vc = jsdom.createVirtualConsole();
     vc.on("log", console.log); // eslint-disable-line no-console
-    vc.on("jsdomError", err => {
+    vc.on("jsdomError", (err) => {
       throw err;
     });
     return new Promise(

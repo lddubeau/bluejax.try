@@ -2,7 +2,7 @@
 import chai from "chai";
 import sinon from "sinon";
 // This import will work in testing.
-// eslint-disable-next-line import/no-unresolved
+// eslint-disable-next-line
 import bluetry from "bluejax.try";
 import $ from "jquery";
 
@@ -30,7 +30,7 @@ describe("", () => {
     nextResponses = [];
     requests = [];
     xhr = sinon.useFakeXMLHttpRequest();
-    xhr.onCreate = request => {
+    xhr.onCreate = (request) => {
       requests.push(request);
       setTimeout(() => {
         const nextResponse = nextResponses.shift();
@@ -52,7 +52,7 @@ describe("", () => {
             request.statusText = "error";
           }
           else {
-            request.respond.apply(request, nextResponse);
+            request.respond(...nextResponse);
           }
         }
       }, 1);
@@ -78,7 +78,7 @@ describe("", () => {
   }
 
   describe("extractBluejaxOptions", () => {
-    it("with three arguments fails", done => {
+    it("with three arguments fails", (done) => {
       assert.throws(
         bluetry.extractBluejaxOptions.bind(bluetry, ["http://something", 2, 3]),
         Error,
@@ -86,7 +86,7 @@ describe("", () => {
       done();
     });
 
-    it("with a single url, no Bluejax options", done => {
+    it("with a single url, no Bluejax options", (done) => {
       const [bluejaxOptions, cleanedOptions] =
               bluetry.extractBluejaxOptions(["http://something"]);
       assert.deepEqual(cleanedOptions, { url: "http://something" });
@@ -94,7 +94,7 @@ describe("", () => {
       done();
     });
 
-    it("with a settings object, no Bluejax options", done => {
+    it("with a settings object, no Bluejax options", (done) => {
       const [bluejaxOptions, cleanedOptions] =
               bluetry.extractBluejaxOptions([{ url: "http://something" }]);
       assert.deepEqual(cleanedOptions, { url: "http://something" });
@@ -102,7 +102,7 @@ describe("", () => {
       done();
     });
 
-    it("with a settings object, and Bluejax options", done => {
+    it("with a settings object, and Bluejax options", (done) => {
       const [bluejaxOptions, cleanedOptions] =
               bluetry.extractBluejaxOptions([{ url: "http://something",
                                                bluejaxOptions: { foo: 1 } }]);
@@ -111,7 +111,7 @@ describe("", () => {
       done();
     });
 
-    it("with a url and a settings object, no Bluejax options", done => {
+    it("with a url and a settings object, no Bluejax options", (done) => {
       const [bluejaxOptions, cleanedOptions] =
               bluetry.extractBluejaxOptions(["http://something",
                                              { data: "foo" }]);
@@ -123,7 +123,7 @@ describe("", () => {
   });
 
   describe("ajax", () => {
-    it("should create a wrapper which mirrors the stock jqXHR", done => {
+    it("should create a wrapper which mirrors the stock jqXHR", (done) => {
       nextResponses.push(something);
       const wrapper = ajax(url);
       nextResponses.push(something);
@@ -136,7 +136,7 @@ describe("", () => {
       });
     });
 
-    it("on success we get the same data as with stock jQuery", done => {
+    it("on success we get the same data as with stock jQuery", (done) => {
       nextResponses.push(something);
       const wrapper = ajax(url);
       wrapper.then((data, textStatus, jqXHR) => {
@@ -151,7 +151,7 @@ describe("", () => {
       });
     });
 
-    it("should reject immediately if tries is unspecified", done => {
+    it("should reject immediately if tries is unspecified", (done) => {
       xhr.restore();
       xhr = null;
 
@@ -170,7 +170,7 @@ describe("", () => {
       });
     });
 
-    it("should reject immediately on HTTP errors", done => {
+    it("should reject immediately on HTTP errors", (done) => {
       nextResponses = [error];
       const wrapper = ajax(url, {
         bluejaxOptions: {
@@ -187,7 +187,7 @@ describe("", () => {
       });
     });
 
-    it("should retry on timeouts", done => {
+    it("should retry on timeouts", (done) => {
       const wrapper = ajax(url, { timeout: 10,
                                   bluejaxOptions: {
                                     tries: 3,
@@ -203,7 +203,7 @@ describe("", () => {
       });
     });
 
-    it("should reject immediately when aborting", done => {
+    it("should reject immediately when aborting", (done) => {
       nextResponses = ["abort"];
       const wrapper = ajax(url, {
         bluejaxOptions: {
@@ -220,7 +220,7 @@ describe("", () => {
       });
     });
 
-    it("should reject immediately when there is a parsing error", done => {
+    it("should reject immediately when there is a parsing error", (done) => {
       nextResponses = [[200, { "Content-Type": "text/json" }, "</q>"]];
       const wrapper = ajax(url, { dataType: "json",
                                   bluejaxOptions: {
@@ -237,7 +237,7 @@ describe("", () => {
       });
     });
 
-    it("should retry when requested and retrying can happen", done => {
+    it("should retry when requested and retrying can happen", (done) => {
       xhr.restore();
       xhr = null;
 
@@ -260,7 +260,7 @@ describe("", () => {
         });
     });
 
-    it("should use the shouldRetry option to decide to retry", done => {
+    it("should use the shouldRetry option to decide to retry", (done) => {
       xhr.restore();
       xhr = null;
 
@@ -283,7 +283,7 @@ describe("", () => {
       });
     });
 
-    it("should produce an xhr that warns when it is modified", done => {
+    it("should produce an xhr that warns when it is modified", (done) => {
       /* eslint-disable no-console */
       sinon.stub(console, "warn");
       nextResponses.push(something);
@@ -298,7 +298,7 @@ describe("", () => {
       wrapper.then(() => done());
     });
 
-    it("should produce an xhr that allows getting headers", done => {
+    it("should produce an xhr that allows getting headers", (done) => {
       nextResponses.push(something);
       const wrapper = ajax("http://example.com:80");
       wrapper.then(() => {
@@ -310,7 +310,7 @@ describe("", () => {
       });
     });
 
-    it("should produce an xhr that allows aborting", done => {
+    it("should produce an xhr that allows aborting", (done) => {
       // We cannot use Sinon's fake XHR for this, because its
       // support for abbort is defficient.
       xhr.restore();
@@ -329,7 +329,7 @@ describe("", () => {
       });
     });
 
-    it("supports statusCode", done => {
+    it("supports statusCode", (done) => {
       nextResponses.push(something);
       const context = { foo: 1 };
       const spy = sinon.spy();
@@ -351,7 +351,7 @@ describe("", () => {
       });
     });
 
-    it("supports success", done => {
+    it("supports success", (done) => {
       nextResponses.push(something);
       const context = { foo: 1 };
       const spy = sinon.spy();
@@ -367,7 +367,7 @@ describe("", () => {
       });
     });
 
-    it("supports error", done => {
+    it("supports error", (done) => {
       nextResponses.push(error);
       const context = { foo: 1 };
       const spy = sinon.spy();
@@ -383,7 +383,7 @@ describe("", () => {
       });
     });
 
-    it("support a statusCode without the matching status", done => {
+    it("support a statusCode without the matching status", (done) => {
       nextResponses.push(something);
       const wrapper = ajax("http://example.com:80", {
         statusCode: {
@@ -400,7 +400,7 @@ describe("", () => {
   });
 
   describe("make", () => {
-    it("sets options", done => {
+    it("sets options", (done) => {
       xhr.restore();
       xhr = null;
 

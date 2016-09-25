@@ -156,7 +156,7 @@
         return this;
       },
 
-			// Cancel the request
+      // Cancel the request
       abort: function abort(statusText) {
         var ret = this.latestXhr.abort(statusText);
         me.transferToWrapper(this.latestXhr);
@@ -175,10 +175,9 @@
 
     for (name in saved) { // eslint-disable-line guard-for-in
       // statusCode is special
-      if (name === "statusCode") {
-        continue;
+      if (name !== "statusCode") {
+        wrapperXhr[name](saved[name]);
       }
-      wrapperXhr[name](saved[name]);
     }
   }
 
