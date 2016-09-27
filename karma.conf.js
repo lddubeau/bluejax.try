@@ -60,6 +60,7 @@ module.exports = function configure(config) {
     },
     reporters: ["progress", "coverage"],
     coverageReporter: {
+      dir: "coverage/karma",
       reporters: [
         { type: "html" },
         { type: "json" },

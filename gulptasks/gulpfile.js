@@ -103,13 +103,17 @@ function runTest(version) {
     }));
 }
 
-const jqueryVersions = ["1.11", "1.12", "2", "3"];
+const jqueryVersions = ["1.11", "1", "2", "3"];
 
 for (const version of jqueryVersions) {
   gulp.task(`test-with-jquery-${version}`, () => runTest(version));
 }
 
-gulp.task("test", () => Promise.each(jqueryVersions, runTest));
+gulp.task("test", () => Promise.each(jqueryVersions, runTest).then(
+  () => exec(
+    "./node_modules/karma-coverage/node_modules/.bin/istanbul " +
+      "report -d ./coverage/combined/ " +
+      "--include 'coverage/karma/**/coverage*.json' html")));
 
 gulp.task("_test", ["semver", "test-mocha", "test-karma"]);
 
@@ -122,11 +126,17 @@ gulp.task("test-mocha", () =>
             "node_modules/.bin/_mocha ./test/commonjs.js"));
 
 gulp.task("test-karma", (done) => {
-  new Server({
+  const options = {
     configFile: `${__dirname}/../karma.conf.js`,
     singleRun: true,
-    browsers: globalOptions.browsers,
-  }, done).start();
+  };
+
+  // We cannot let it be set to ``null`` or ``undefined``.
+  if (globalOptions.browsers) {
+    options.browsers = globalOptions.browsers;
+  }
+
+  new Server(options, done).start();
 });
 
 gulp.task("pack", ["default"], Promise.coroutine(function *distTask() {
