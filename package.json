@@ -1,7 +1,7 @@
 {
   "name": "bluejax.try",
   "description": "A library for retrying Ajax requests.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "versionedSources": "index.js",
   "keywords": [
     "Ajax",
